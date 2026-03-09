@@ -1,0 +1,41 @@
+# roBrowser .htaccess Configuration
+
+# Enable Rewrite Engine
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /robrowser/
+    
+    # Handle 404 errors - redirect to index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+# CORS Headers
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, HEAD"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header set Access-Control-Allow-Credentials "true"
+</IfModule>
+
+# MIME Types
+<IfModule mod_mime.c>
+    AddType image/bmp .bmp
+    AddType image/tga .tga
+    AddType image/png .png
+    AddType image/jpeg .jpg .jpeg
+    AddType image/gif .gif
+    AddType application/octet-stream .rsm .gnd .gat .str .spr .act .pal .grf
+    AddType audio/wav .wav
+    AddType audio/mpeg .mp3
+    AddType audio/ogg .ogg
+    AddType text/plain .txt .lua .lub
+    AddType application/xml .xml
+</IfModule>
+
+# Error Document
+ErrorDocument 404 /robrowser/index.php
+
+# Disable directory browsing
+Options -Indexes
