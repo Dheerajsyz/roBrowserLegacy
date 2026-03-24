@@ -4326,7 +4326,9 @@ define(['Utils/BinaryWriter', './PacketVerManager', 'Utils/Struct', 'Core/Config
 	};
 	PACKET.CZ.REQ_TRADE_BUYING_STORE.prototype.build = function() {
 		var ver = this.getPacketVersion();
-		var len = 2 + 2 + 4 + 4 + this.itemList.length * 6; // ver[2] = -1
+		var useLongItemId = (CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704);
+		var itemSize = useLongItemId ? 8 : 6;
+		var len = 2 + 2 + 4 + 4 + this.itemList.length * itemSize; // ver[2] = -1
 		var pkt = new BinaryWriter(len);
 		var i, count;
 
@@ -4337,8 +4339,12 @@ define(['Utils/BinaryWriter', './PacketVerManager', 'Utils/Struct', 'Core/Config
 
 		for (i = 0, count = this.itemList.length; i < count; ++i) {
 			pkt.writeUShort(this.itemList[i].index);
-			pkt.writeUShort(this.itemList[i].ITID);
-			pkt.writeShort(this.itemList[i].count);
+			if (useLongItemId) {
+				pkt.writeULong(this.itemList[i].ITID);
+			} else {
+				pkt.writeUShort(this.itemList[i].ITID);
+			}
+			pkt.writeUShort(this.itemList[i].count);
 		}
 
 		return pkt;
@@ -10672,15 +10678,17 @@ define(['Utils/BinaryWriter', './PacketVerManager', 'Utils/Struct', 'Core/Config
 		this.AID = fp.readULong();
 		this.UniqueID = fp.readULong();
 		this.limitZeny = fp.readLong();
+		var useLongItemId = (CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704);
+		var itemSize = useLongItemId ? 11 : 9;
 		this.itemList = (function() {
-			var i, count = (end - fp.tell()) / 9 | 0,
+			var i, count = (end - fp.tell()) / itemSize | 0,
 				out = new Array(count);
 			for (i = 0; i < count; ++i) {
 				out[i] = {};
 				out[i].price = fp.readLong();
 				out[i].count = fp.readShort();
 				out[i].type = fp.readUChar();
-				out[i].ITID = fp.readUShort();
+				out[i].ITID = useLongItemId ? fp.readULong() : fp.readUShort();
 			}
 			return out;
 		})();
@@ -10697,11 +10705,12 @@ define(['Utils/BinaryWriter', './PacketVerManager', 'Utils/Struct', 'Core/Config
 
 	// 0x81b
 	PACKET.ZC.UPDATE_ITEM_FROM_BUYING_STORE = function PACKET_ZC_UPDATE_ITEM_FROM_BUYING_STORE(fp, end) {
-		this.ITID = fp.readUShort();
+		var useLongItemId = (CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704);
+		this.ITID = useLongItemId ? fp.readULong() : fp.readUShort();
 		this.count = fp.readShort();
 		this.limitZeny = fp.readLong();
 	};
-	PACKET.ZC.UPDATE_ITEM_FROM_BUYING_STORE.size = 10;
+	PACKET.ZC.UPDATE_ITEM_FROM_BUYING_STORE.size = ((CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704)) ? 12 : 10;
 
 
 	// 0x81c
@@ -10766,9 +10775,9 @@ define(['Utils/BinaryWriter', './PacketVerManager', 'Utils/Struct', 'Core/Config
 	// 0x824
 	PACKET.ZC.FAILED_TRADE_BUYING_STORE_TO_SELLER = function PACKET_ZC_FAILED_TRADE_BUYING_STORE_TO_SELLER(fp, end) {
 		this.Result = fp.readShort();
-		this.ITID = fp.readUShort();
+		this.ITID = ((CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704)) ? fp.readULong() : fp.readUShort();
 	};
-	PACKET.ZC.FAILED_TRADE_BUYING_STORE_TO_SELLER.size = 6;
+	PACKET.ZC.FAILED_TRADE_BUYING_STORE_TO_SELLER.size = ((CLASSIC && PACKETVER.value >= 20181121) || (RENEWAL && PACKETVER.value >= 20180704)) ? 8 : 6;
 
 
 	// 0x826

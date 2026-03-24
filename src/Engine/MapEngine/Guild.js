@@ -45,6 +45,16 @@ define(function( require )
 	 */
 	var _emblems = {};
 
+	/** Build base URL for emblem/userconfig API (https, http, or /api; host:port → http://) */
+	function normalizeWebApiBase(url) {
+		if (!url) {
+			return '';
+		}
+		if (/^https?:\/\//.test(url) || url.indexOf('/') === 0) {
+			return url.replace(/\/$/, '');
+		}
+		return ('http://' + url).replace(/\/$/, '');
+	}
 
 	/**
 	 * Initialize engine
@@ -164,6 +174,7 @@ define(function( require )
 				return;
 
 			var webAddress = Configs.get('webserverAddress', '127.0.0.1:8888');
+			var baseUrl = normalizeWebApiBase(webAddress);
 
 			var formData = new FormData();
 			formData.append('GDID', guild_id);
@@ -172,7 +183,7 @@ define(function( require )
 			formData.append('AID', Session.AID);
 
 			var xhr = new XMLHttpRequest();      
-			xhr.open('POST', 'http://' + webAddress + '/emblem/download', true);
+			xhr.open('POST', baseUrl + '/emblem/download', true);
 			xhr.responseType = 'blob';
 
 			xhr.onload = function() {
@@ -434,6 +445,7 @@ define(function( require )
 		return function sendEmblem(data) {  
 			if(PACKETVER.value >= 20170315){   
 				var webAddress = Configs.get('webserverAddress', '127.0.0.1:8888');  
+				var baseUrl = normalizeWebApiBase(webAddress);
 				function getFileType(d) {
 					if (d.length >= 3 && d[0] === 0x47 && d[1] === 0x49 && d[2] === 0x46) {
 						return { type: 'image/gif', imgType: 'GIF' };
@@ -450,7 +462,7 @@ define(function( require )
 				formData.append('ImgType', fileInfo.imgType);      
 
 				var xhr = new XMLHttpRequest();      
-				xhr.open('POST', 'http://' + webAddress + '/emblem/upload', true);  
+				xhr.open('POST', baseUrl + '/emblem/upload', true);  
 
 				xhr.onload = function() {    
 					if (xhr.status === 200) {

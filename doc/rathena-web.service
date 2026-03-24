@@ -1,0 +1,17 @@
+[Unit]
+Description=rAthena Web Server (emblem/userconfig API)
+After=network.target mysql.service
+PartOf=rathena.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=ubuntu
+WorkingDirectory=/home/ubuntu/rathena
+ExecStart=/home/ubuntu/rathena/athena-start start web
+ExecStop=/home/ubuntu/rathena/athena-start stop web
+ExecReload=/home/ubuntu/rathena/athena-start restart web
+
+[Install]
+WantedBy=multi-user.target
+

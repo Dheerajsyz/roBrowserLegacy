@@ -28,7 +28,7 @@ header('Expires: 0');
             development: true,
             remoteClient: 'https://cyro.live/grf/',
             registrationweb: 'https://cyro.live/?module=account&action=create',
-            webserverAddress: 'http://127.0.0.1:8888/',
+            webserverAddress: 'https://cyro.live/api',
             servers: [{
                 display: 'CyRO',
                 desc: 'Play in RO in Browser',
