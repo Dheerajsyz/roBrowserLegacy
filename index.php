@@ -2,6 +2,11 @@
 header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
+
+$assetVersion = @filemtime(__DIR__ . '/dist/Web/Online.js');
+if (!$assetVersion) {
+    $assetVersion = time();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -26,6 +31,8 @@ header('Expires: 0');
     <script>
         window.ROConfigLocal = {
             development: false,
+            enableConsole: true,
+            disableConsole: false,
             remoteClient: 'https://cyro.live/grf/',
             registrationweb: 'https://cyro.live/?module=account&action=create',
             webserverAddress: 'https://cyro.live/api',
@@ -46,7 +53,7 @@ header('Expires: 0');
             skipIntro: true
         };
     </script>
-    <script src="/rb2/dist/Web/Config.js"></script>
+    <script src="/rb2/dist/Web/Config.js?v=<?php echo $assetVersion; ?>"></script>
     <script>
         function deepMerge(target, source) {
             for (var key in source) {
@@ -70,7 +77,7 @@ header('Expires: 0');
 
             var script = document.createElement('script');
             script.type = 'module';
-            script.src = '/rb2/dist/Web/Online.js';
+            script.src = '/rb2/dist/Web/Online.js?v=<?php echo $assetVersion; ?>';
             document.body.appendChild(script);
         });
     </script>
