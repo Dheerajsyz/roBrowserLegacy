@@ -24,7 +24,7 @@ header('Expires: 0');
         }
     </style>
     <script>
-        window.ROConfig = {
+        window.ROConfigLocal = {
             development: false,
             remoteClient: 'https://cyro.live/grf/',
             registrationweb: 'https://cyro.live/?module=account&action=create',
@@ -46,7 +46,34 @@ header('Expires: 0');
             skipIntro: true
         };
     </script>
-    <script type="module" src="/rb2/dist/Web/Online.js"></script>
+    <script src="/rb2/dist/Web/Config.js"></script>
+    <script>
+        function deepMerge(target, source) {
+            for (var key in source) {
+                if (source.hasOwnProperty(key)) {
+                    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                        target[key] = deepMerge(target[key] || {}, source[key]);
+                    } else {
+                        target[key] = source[key];
+                    }
+                }
+            }
+            return target;
+        }
+
+        window.addEventListener('load', function () {
+            var config = deepMerge({}, window.ROConfigBase || {});
+            if (window.ROConfigLocal) {
+                config = deepMerge(config, window.ROConfigLocal);
+            }
+            window.ROConfig = config;
+
+            var script = document.createElement('script');
+            script.type = 'module';
+            script.src = '/rb2/dist/Web/Online.js';
+            document.body.appendChild(script);
+        });
+    </script>
 </head>
 <body>
     <div id="game"></div>
