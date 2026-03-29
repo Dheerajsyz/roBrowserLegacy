@@ -112,13 +112,28 @@ function Delegate(source, origin) {
  */
 function Init() {
 	if (!_source) {
-		const workerUrl = new URL('./ThreadEventHandler.js', import.meta.url);
 		const version = Configs.get('version', null);
-		if (version) {
-			workerUrl.searchParams.set('v', String(version));
+		const isDev = !!Configs.get('development', false);
+		let workerUrl;
+		let workerOptions;
+
+		if (isDev) {
+			workerUrl = new URL('./ThreadEventHandler.js', import.meta.url);
+			if (version) {
+				workerUrl.searchParams.set('v', String(version));
+			}
+			workerOptions = { type: 'module' };
+		} else {
+			// In production bundle, force the emitted worker file path to avoid
+			// worker inlining as a data URL with unresolved module imports.
+			const path = '/rb2/dist/Web/ThreadEventHandler.js';
+			workerUrl = version ? path + '?v=' + encodeURIComponent(String(version)) : path;
+			// Built ThreadEventHandler.js is a plain bundled script in production.
+			// Use a classic worker for maximum browser compatibility.
+			workerOptions = {};
 		}
 
-		_source = new Worker(workerUrl, { type: 'module' });
+		_source = new Worker(workerUrl, workerOptions);
 
 		// Surface worker bootstrap/runtime issues that otherwise look like a silent black screen.
 		_source.addEventListener('error', function (event) {
