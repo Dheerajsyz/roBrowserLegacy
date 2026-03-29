@@ -14,18 +14,6 @@ import ShadowTable from 'DB/Monsters/ShadowTable.js';
 import MountTable from 'DB/Jobs/MountTable.js';
 import AllMountTable from 'DB/Jobs/AllMountTable.js';
 import EntityAction from './EntityAction.js';
-
-// Reverse-lookup set: all job IDs that are AllMount costume values.
-// Used to reliably detect halter-lead mounts regardless of which code
-// path set this.costume (UpdateBody loop, updateAllRidingState, etc.).
-const AllMountSet = (function() {
-	const set = {};
-	for (const k in AllMountTable) {
-		set[AllMountTable[k]] = true;
-	}
-	return set;
-}());
-
 import PACKETVER from 'Network/PacketVerManager.js';
 import JobConst from 'DB/Jobs/JobConst.js';
 import Session from 'Engine/SessionStorage.js';
@@ -557,21 +545,15 @@ function UpdateBodyPalette(pal) {
 		return;
 	}
 
-	// Halter lead mounts (AllMountTable) don't use player clothing palettes.
-	// Skip palette for these to avoid turning them pink.
-	// Use a pre-built reverse-lookup set so the check is robust regardless
-	// of which code path set this.costume (UpdateBody, updateAllRidingState,
-	// or updateEffectState overrides for dual-table jobs like Knight).
-	if (this.costume && AllMountSet[this.costume]) {
-		this.files.body.pal = null;
-		return;
-	}
-	const palJob = this.costume || this._job;
-	this.files.body.pal = DB.getBodyPalPath(palJob, this._bodypalette, this._sex);
+	this.files.body.pal = DB.getBodyPalPath(this._job, this._bodypalette, this._sex);
 }
 
 /**
  * Update head
+ *
+ * @param {number} head index
+ */
+function UpdateHead(head) {
 	let path;
 
 	if (head < 0) {
