@@ -149,7 +149,7 @@ async function compile(appName, isMinify) {
 				minify: isMinify ? 'terser' : false,
 				terserOptions: isMinify
 					? {
-							output: {
+							format: {
 								ascii_only: true,
 								comments: false
 							}

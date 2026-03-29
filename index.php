@@ -25,7 +25,7 @@ header('Expires: 0');
     </style>
     <script>
         window.ROConfig = {
-            development: true,
+            development: false,
             remoteClient: 'https://cyro.live/grf/',
             registrationweb: 'https://cyro.live/?module=account&action=create',
             webserverAddress: 'https://cyro.live/api',
@@ -46,13 +46,7 @@ header('Expires: 0');
             skipIntro: true
         };
     </script>
-    <script src="/robrowser/src/Vendors/require.js"></script>
-    <script>
-        require.config({
-            baseUrl: '/robrowser/src/'
-        });
-        require(['App/Online']);
-    </script>
+    <script type="module" src="/rb2/dist/Web/Online.js"></script>
 </head>
 <body>
     <div id="game"></div>
