@@ -39,12 +39,13 @@ const _emblems = {};
 
 /** Build base URL for emblem/userconfig API (https, http, or /api; host:port -> http://) */
 function normalizeWebApiBase(url) {
-                return '';
-        }
-        if (/^https?:\/\//.test(url) || url.indexOf('/') === 0) {
-                return url.replace(/\/$/, '');
-        }
-        return ('http://' + url).replace(/\/$/, '');
+	if (!url) {
+		return '';
+	}
+	if (/^https?:\/\//.test(url) || url.indexOf('/') === 0) {
+		return url.replace(/\/$/, '');
+	}
+	return ('http://' + url).replace(/\/$/, '');
 }
 
 /**
