@@ -29,6 +29,7 @@ header('Expires: 0');
             remoteClient: 'https://cyro.live/grf/',
             registrationweb: 'https://cyro.live/?module=account&action=create',
             webserverAddress: 'https://cyro.live/api',
+            socketProxy: 'wss://cyro.live/ws/',
             servers: [{
                 display: 'CyRO',
                 desc: 'Play in RO in Browser',
@@ -39,7 +40,6 @@ header('Expires: 0');
                 packetver: 20211103,
                 renewal: false,
                 packetKeys: false,
-                socketProxy: 'wss://cyro.live/ws/',
                 adminList: [2000000]
             }],
             skipServerList: true,
