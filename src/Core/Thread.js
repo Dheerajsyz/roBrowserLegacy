@@ -113,6 +113,15 @@ function Delegate(source, origin) {
 function Init() {
 	if (!_source) {
 		_source = new Worker(new URL('./ThreadEventHandler.js', import.meta.url), { type: 'module' });
+
+		// Surface worker bootstrap/runtime issues that otherwise look like a silent black screen.
+		_source.addEventListener('error', function (event) {
+			console.error('[Thread] Worker error:', event.message, event.filename, event.lineno + ':' + event.colno);
+		});
+
+		_source.addEventListener('messageerror', function (event) {
+			console.error('[Thread] Worker message error:', event);
+		});
 	}
 
 	// Worker context
