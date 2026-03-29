@@ -30,6 +30,7 @@ if (!$assetVersion) {
     </style>
     <script>
         window.ROConfigLocal = {
+            version: <?php echo $assetVersion; ?>,
             development: false,
             enableConsole: true,
             disableConsole: false,

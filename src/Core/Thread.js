@@ -112,7 +112,13 @@ function Delegate(source, origin) {
  */
 function Init() {
 	if (!_source) {
-		_source = new Worker(new URL('./ThreadEventHandler.js', import.meta.url), { type: 'module' });
+		const workerUrl = new URL('./ThreadEventHandler.js', import.meta.url);
+		const version = Configs.get('version', null);
+		if (version) {
+			workerUrl.searchParams.set('v', String(version));
+		}
+
+		_source = new Worker(workerUrl, { type: 'module' });
 
 		// Surface worker bootstrap/runtime issues that otherwise look like a silent black screen.
 		_source.addEventListener('error', function (event) {
