@@ -31,8 +31,6 @@ import NpcMenu from 'UI/Components/NpcMenu/NpcMenu.js';
 import Sense from 'UI/Components/Sense/Sense.js';
 import Announce from 'UI/Components/Announce/Announce.js';
 import Renderer from 'Renderer/Renderer.js';
-import MapRenderer from 'Renderer/MapRenderer.js';
-import UIManager from 'UI/UIManager.js';
 import SkillWindow from 'UI/Components/SkillList/SkillList.js';
 
 import SnowWeatherEffect from 'Renderer/Effects/SnowWeather.js';
@@ -351,13 +349,7 @@ function onIdentifyResult(pkt) {
  * @param {object} pkt - PACKET.ZC.AUTOSPELLLIST
  */
 function onAutoSpellList(pkt) {
-	console.log('=== AUTOSPELLLIST DEBUG ===');
-	console.log('Received SKID array:', pkt.SKID);
-	console.log('Array length:', pkt.SKID.length);
-	console.log('Array contents:', JSON.stringify(pkt.SKID));
-
 	if (!pkt.SKID.length) {
-		console.log('Empty array, returning');
 		return;
 	}
 
@@ -616,10 +608,6 @@ function onUseSkill(id, level, targetID) {
 
 	const isHomun = id > SkillId.HOMUN_BEGIN && id < SkillId.HOMUN_LAST;
 	const isMerc = id > SkillId.MERCENARY_BEGIN && id < SkillId.MERCENARY_LAST;
-
-	if (id === SkillId.MC_VENDING) {
-		console.log('Using Vending skill', id, level, targetID);
-	}
 
 	// Not used so far
 	//var isElem = (id > SkillId.ELEMENTAL_BEGIN && id < SkillId.ELEMENTAL_LAST);
@@ -888,29 +876,6 @@ function onSense(pkt) {
 	Sense.setWindow(pkt);
 }
 
-/**
- * Handle SG_FEEL map registration request
- *
- * @param {object} pkt - PACKET.ZC.STARPLACE
- */
-function onStarPlace(pkt) {
-	const starTypes = [ 'Sun', 'Moon', 'Stars' ];
-	const starType  = starTypes[ pkt.which ] || 'Sun';
-	const mapName   = DB.getMapName( MapRenderer.currentMap, MapRenderer.currentMap );
-
-	UIManager.showPromptBox(
-		'Do you want to register \'' + mapName + '\' as your ' + starType + ' feeling map?',
-		'ok',
-		'cancel',
-		function() {
-			const response  = new PACKET.CZ.AGREE_STARPLACE();
-			response.which = pkt.which;
-			Network.sendPacket( response );
-		},
-		null
-	);
-}
-
 function hookSkillWindow() {
 	SkillWindow.getUI().onIncreaseSkill = onIncreaseSkill;
 	SkillWindow.getUI().onUseSkill = onUseSkill;
@@ -958,5 +923,4 @@ export default function SkillEngine() {
 	Network.hookPacket(PACKET.ZC.MSG_SKILL, onMessageSkill);
 	Network.hookPacket(PACKET.ZC.MONSTER_INFO, onSense);
 	Network.hookPacket(PACKET.ZC.DEVOTIONLIST, onDevotionList);
-	Network.hookPacket(PACKET.ZC.STARPLACE, onStarPlace);
 }

@@ -117,10 +117,6 @@ function onEntitySpam(pkt) {
 	} else {
 		entity = new Entity();
 		entity.set(pkt);
-		// Initialize last valid job for falcon/mount persistence
-		if (typeof pkt.job !== 'undefined' && pkt.job !== null) {
-			entity._lastValidJob = pkt.job;
-		}
 		if (pkt.job == 45) {
 			const EF_Init_Par = {
 				ownerAID: entity.GID,
@@ -146,17 +142,11 @@ function onEntitySpam(pkt) {
 			entity.falcon = new Entity();
 		}
 
-		// Cache the last valid job id for falcon use
-		if (!entity._lastValidJob) {
-			entity._lastValidJob = entity._job;
-		} else if (entity._job) {
-			entity._lastValidJob = entity._job;
-		}
 		entity.falcon.set({
 			objecttype: entity.falcon.constructor.TYPE_FALCON,
 			GID: entity.GID + '_FALCON',
 			PosDir: [entity.position[0], entity.position[1], 0],
-			job: (entity._job || entity._lastValidJob) + '_FALCON',
+			job: entity._job + '_FALCON',
 			speed: Math.max(entity.walk.speed - 50, 1),
 			name: '',
 			hp: -1,
@@ -1334,15 +1324,9 @@ function onEntityViewChange(pkt) {
 			entity.aura.load(EffectManager);
 
 			if (entity.falcon) {
-				// Use cached job if current is missing
-				if (!entity._lastValidJob) {
-					entity._lastValidJob = entity._job;
-				} else if (entity._job) {
-					entity._lastValidJob = entity._job;
-				}
 				entity.falcon.set({
 					PosDir: [entity.position[0], entity.position[1], 0],
-					job: (entity._job || entity._lastValidJob) + '_FALCON'
+					job: entity._job + '_FALCON'
 				});
 			}
 			if (entity.wug) {
