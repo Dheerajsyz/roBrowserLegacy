@@ -15,7 +15,6 @@ import PACKETVER from 'Network/PacketVerManager.js';
 import CheckAttendance from 'UI/Components/CheckAttendance/CheckAttendance.js';
 import EnchantGradeUI from 'UI/Components/EnchantGrade/EnchantGrade.js';
 import EnchantUI from 'UI/Components/Enchant/Enchant.js';
-import Stylist from 'UI/Components/Stylist/Stylist.js';
 
 /**
  * Load dependencies
@@ -42,12 +41,6 @@ function onUIOpen(pkt) {
 	//    10 = ENCHANT_UI
 
 	switch (pkt.ui_type) {
-		case 1:
-			if (PACKETVER.value >= 20141008) {
-				Stylist.prepare();
-				Stylist.append();
-			}
-			break;
 		case 7:
 			if (Configs.get('enableCheckAttendance') && PACKETVER.value >= 20180307) {
 				CheckAttendance.prepare();
