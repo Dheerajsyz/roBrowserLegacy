@@ -3,7 +3,7 @@
 # Enable Rewrite Engine
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /robrowser/
+    RewriteBase /rb2/
     
     # Handle 404 errors - redirect to index.php
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -35,7 +35,7 @@
 </IfModule>
 
 # Error Document
-ErrorDocument 404 /robrowser/index.php
+ErrorDocument 404 /rb2/index.php
 
 # Disable directory browsing
 Options -Indexes
