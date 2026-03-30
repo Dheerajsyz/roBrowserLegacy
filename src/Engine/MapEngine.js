@@ -395,7 +395,6 @@ MapEngine.init = function init(ip, port, mapName) {
 		Escape.onReturnSavePointRequest = onReturnSavePointRequest;
 		Escape.onResurectionRequest = onResurectionRequest;
 		ChatBox.onRequestTalk = onRequestTalk;
-		WhisperBox.onRequestTalk = onRequestTalk;
 	}
 
 	// Init selected UIs when needed
@@ -418,7 +417,7 @@ MapEngine.init = function init(ip, port, mapName) {
 		Equipment.getUI().onEquipItem = onEquipItem;
 		Equipment.getUI().onRemoveOption = onRemoveOption;
 		Inventory.getUI().onUseItem = onUseItem;
-		Equipment.getUI().onEquipItem = onEquipItem;
+		Inventory.getUI().onEquipItem = onEquipItem;
 
 		// Avoid zone server change init
 		MapEngine.needsUIVerUpdate = false;

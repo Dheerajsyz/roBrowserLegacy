@@ -870,19 +870,20 @@ function loadFontFromClient(fontPath) {
 							}  
 						`;
 					document.head.appendChild(style);
-					document.body.style.fontFamily = 'Arial, Helvetica, sans-serif';
+				document.body.style.fontFamily = "'SCDream', Arial, Helvetica, sans-serif";
+				document.body.style.fontSize = '12px';
 				},
 				function (error) {
 					console.warn('[loadFontFromClient] - Failed loading client font:', fontPath, '- Using Arial');
 					document.body.style.fontFamily = 'Arial, Helvetica, sans-serif';
-					document.body.style.fontSize = '10px';
+				document.body.style.fontSize = '12px';
 				}
 			);
 		},
 		function (error) {
 			console.warn('[loadFontFromClient] - Failed loading client font:', fontPath, '- Using Arial');
 			document.body.style.fontFamily = 'Arial, Helvetica, sans-serif';
-			document.body.style.fontSize = '10px';
+		document.body.style.fontSize = '12px';
 		}
 	);
 }

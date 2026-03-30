@@ -197,6 +197,7 @@ function onHomunInformationUpdate(pkt) {
 			case 0:
 				HomunInformations.append();
 				Session.homunId = pkt.GID;
+					HomunInformations.startAI();
 				break;
 
 			case 1:

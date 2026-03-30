@@ -54,6 +54,27 @@ AIDriver.addCTX = function addAIctx() {
 				EleanorMode=0
 				RegenTick = {}
 
+				function SplitByComma(str)
+					local t = {}
+					local i = 1
+					for v in string.gmatch(tostring(str), "([^,]+)") do
+						t[i] = tonumber(v) or v
+						i = i + 1
+					end
+					if t[1] == nil then
+						t[1] = 0
+					end
+					return t
+				end
+
+				function GetMsg(id)
+					return SplitByComma(GetMsgJS(id))
+				end
+
+				function GetResMsg(id)
+					return SplitByComma(GetResMsgJS(id))
+				end
+
 				function GetV(V_, id)
 					local res = GetVJS(V_, id)
 					if(V_ == 1 or V_ == 13) then
@@ -263,7 +284,7 @@ AIDriver.addCTX = function addAIctx() {
 			return Date.now() - scriptStartTime;
 		};
 
-		ctx.GetMsg = function GetMsgJS(id) {
+		ctx.GetMsgJS = function GetMsgJS(id) {
 			if (id in msg) {
 				const res = msg[id];
 				delete msg[id];
@@ -272,7 +293,7 @@ AIDriver.addCTX = function addAIctx() {
 			return '0';
 		};
 
-		ctx.GetResMsg = function GetResMsg(id) {
+		ctx.GetResMsgJS = function GetResMsgJS(id) {
 			if (id in resMsg) {
 				const res = resMsg[id];
 				delete resMsg[id];

@@ -18,6 +18,17 @@ import PACKETVER from 'Network/PacketVerManager.js';
 import JobConst from 'DB/Jobs/JobConst.js';
 import Session from 'Engine/SessionStorage.js';
 
+// Reverse-lookup set: all job IDs that are AllMount costume values.
+// Used to reliably detect halter-lead mounts regardless of which code
+// path set this.costume (UpdateBody loop, updateAllRidingState, etc.).
+const AllMountSet = (function () {
+	const set = {};
+	for (const k in AllMountTable) {
+		set[AllMountTable[k]] = true;
+	}
+	return set;
+}());
+
 /**
  * Files to display a view
  *
@@ -489,12 +500,13 @@ function UpdateBodyStyle(look) {
 				if (
 					look > JobConst.COSTUME_SECOND_JOB_START &&
 					look < JobConst.COSTUME_SECOND_JOB_END &&
-					this._allRidingState
+					this._allRidingState &&
+					mountValue
 				) {
 					// we don't have costume all_riding constants
 					job = mountValue;
 					cashMountCostume = true;
-				} else {
+				} else if (mountValue) {
 					look = mountValue;
 					job = this.costume;
 				}
@@ -545,7 +557,22 @@ function UpdateBodyPalette(pal) {
 		return;
 	}
 
-	this.files.body.pal = DB.getBodyPalPath(this._job, this._bodypalette, this._sex);
+	// Halter lead mounts (AllMountTable) don't use player clothing palettes.
+	// Skip palette for these to avoid turning them pink.
+	// Use a pre-built reverse-lookup set so the check is robust regardless
+	// of which code path set this.costume (UpdateBody, updateAllRidingState,
+	// or updateEffectState overrides for dual-table jobs like Knight).
+	if (this.costume && AllMountSet[this.costume]) {
+		this.files.body.pal = null;
+		return;
+	}
+
+	const visibleJob = this.costume || this.job || this._job;
+	const basePalPath = DB.getBodyPalPath(this._job, this._bodypalette, this._sex);
+	const visiblePalPath = DB.getBodyPalPath(visibleJob, this._bodypalette, this._sex);
+
+	// Newer clients use mount/costume palette names for mounted body recolors.
+	this.files.body.pal = visiblePalPath || basePalPath;
 }
 
 /**
