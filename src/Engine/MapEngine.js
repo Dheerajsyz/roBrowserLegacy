@@ -739,6 +739,8 @@ function onServerChange(pkt) {
 	MapEngine.init(pkt.addr.ip, pkt.addr.port, pkt.mapName);
 }
 
+let _exitTimeout = null;
+
 /**
  * Ask the server to disconnect
  */
@@ -747,7 +749,12 @@ function onExitRequest() {
 	Network.sendPacket(pkt);
 
 	// Wait a second, if no answer from the server, then close it.
-	Events.setTimeout(function () {
+	if (_exitTimeout !== null) {
+		window.clearTimeout(_exitTimeout);
+	}
+
+	_exitTimeout = window.setTimeout(function () {
+		_exitTimeout = null;
 		onExitSuccess();
 	}, 1000);
 }
@@ -767,24 +774,46 @@ function onExitFail(pkt) {
  * @param {object} pkt - PACKET.ZC.REFUSE_QUIT
  */
 function onExitSuccess() {
-	if (PACKETVER.value >= 20170315 && Session.WebToken) {
-		ShortCut.saveToServer();
+	if (_exitTimeout !== null) {
+		window.clearTimeout(_exitTimeout);
+		_exitTimeout = null;
 	}
 
-	WhisperBox.clearAll();
-	UIManager.removeComponents();
-	Network.close();
-	Renderer.stop();
-	MapRenderer.free();
-	SoundManager.stop();
-	BGM.stop();
-	if (PACKETVER.value < 20181114) {
-		Background.remove();
-		Background.setImage('bgi_temp.bmp', function () {
-			import('Engine/GameEngine.js').then(m => m.default.reload());
-		});
-	} else {
-		import('Engine/GameEngine.js').then(m => m.default.reload());
+	const reloadToLogin = function () {
+		if (PACKETVER.value < 20181114) {
+			try {
+				Background.remove();
+				Background.setImage('bgi_temp.bmp', function () {
+					import('Engine/GameEngine.js')
+						.then(m => m.default.reload())
+						.catch(() => window.location.reload());
+				});
+			} catch (e) {
+				window.location.reload();
+			}
+		} else {
+			import('Engine/GameEngine.js')
+				.then(m => m.default.reload())
+				.catch(() => window.location.reload());
+		}
+	};
+
+	try {
+		if (PACKETVER.value >= 20170315 && Session.WebToken) {
+			ShortCut.saveToServer();
+		}
+
+		WhisperBox.clearAll();
+		UIManager.removeComponents();
+		Network.close();
+		Renderer.stop();
+		MapRenderer.free();
+		SoundManager.stop();
+		BGM.stop();
+	} catch (e) {
+		console.error('Exit cleanup failed, forcing reload', e);
+	} finally {
+		reloadToLogin();
 	}
 }
 

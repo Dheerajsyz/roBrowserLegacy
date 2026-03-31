@@ -2381,6 +2381,19 @@ PACKET.CZ.TAEKWON_RANK.prototype.build = function () {
 	return pkt_buf;
 };
 
+// 0x097C - CZ_REQ_RANKING (PACKETVER >= 20130605, unified ranking request)
+// rankType: 0=Blacksmith, 1=Alchemist, 2=Taekwon, 3=PK
+PACKET.CZ.RANKING = function PACKET_CZ_RANKING() {
+	this.rankType = 0;
+};
+PACKET.CZ.RANKING.prototype.build = function () {
+	const pkt_len = 2 + 2;
+	const pkt_buf = new BinaryWriter(pkt_len);
+	pkt_buf.writeShort(0x097C);
+	pkt_buf.writeShort(this.rankType);
+	return pkt_buf;
+};
+
 // 0x228
 PACKET.CZ.ACK_GAME_GUARD = function PACKET_CZ_ACK_GAME_GUARD() {
 	this.AuthData = 0;
@@ -6669,6 +6682,54 @@ PACKET.ZC.NOTIFY_RANKING = function PACKET_ZC_NOTIFY_RANKING(fp, end) {
 	this.total = fp.readLong();
 };
 PACKET.ZC.NOTIFY_RANKING.size = 14;
+
+// 0x097d - ZC_ACK_RANKING (PACKETVER 20130605 to 20190730, unified ranking response with names)
+// rankType: 0=Blacksmith, 1=Alchemist, 2=Taekwon, 3=PK
+PACKET.ZC.ACK_RANKING = function PACKET_ZC_ACK_RANKING(fp, end) {
+	this.rankType = fp.readShort();
+	this.Name = (function () {
+		const count = 10,
+			out = new Array(count);
+		for (let i = 0; i < count; ++i) {
+			out[i] = fp.readString(NAME_LENGTH);
+		}
+		return out;
+	})();
+	this.Point = (function () {
+		const count = 10,
+			out = new Array(count);
+		for (let i = 0; i < count; ++i) {
+			out[i] = fp.readLong();
+		}
+		return out;
+	})();
+	this.myPoints = fp.readLong();
+};
+PACKET.ZC.ACK_RANKING.size = 288;
+
+// 0x0af6 - ZC_ACK_RANKING (PACKETVER >= 20190731, unified ranking response with char IDs)
+// rankType: 0=Blacksmith, 1=Alchemist, 2=Taekwon, 3=PK
+PACKET.ZC.ACK_RANKING2 = function PACKET_ZC_ACK_RANKING2(fp, end) {
+	this.rankType = fp.readShort();
+	this.CharID = (function () {
+		const count = 10,
+			out = new Array(count);
+		for (let i = 0; i < count; ++i) {
+			out[i] = fp.readLong();
+		}
+		return out;
+	})();
+	this.Point = (function () {
+		const count = 10,
+			out = new Array(count);
+		for (let i = 0; i < count; ++i) {
+			out[i] = fp.readLong();
+		}
+		return out;
+	})();
+	this.myPoints = fp.readLong();
+};
+PACKET.ZC.ACK_RANKING2.size = 88;
 
 // 0x19b
 PACKET.ZC.NOTIFY_EFFECT = function PACKET_ZC_NOTIFY_EFFECT(fp, end) {

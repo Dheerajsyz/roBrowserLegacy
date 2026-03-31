@@ -38,6 +38,7 @@ const ChangeCart = new UIComponent('ChangeCart', htmlText, cssText);
  */
 const _carts = {};
 const _layerEntity = new Entity();
+let _mode = 'change';
 
 /**
  * Initialize UI
@@ -88,7 +89,17 @@ function loadCartData() {
  * Change cart (Change cart packet IDs are not the same as global cart IDs!!)
  */
 function onCart(num) {
-	if (Session.Entity.hasCart == false || num < 0 || num > 8) {
+	num = parseInt(num, 10);
+
+	if (Session.Entity.hasCart == false || Number.isNaN(num)) {
+		return;
+	}
+
+	if (_mode === 'decorate') {
+		if (num < 10 || num > 13) {
+			return;
+		}
+	} else if (num < 1 || num > 9) {
 		return;
 	}
 
@@ -107,6 +118,8 @@ ChangeCart.onAppend = function onAppend() {
 };
 
 ChangeCart.onChangeCartSkill = function onChangeCartSkill() {
+	_mode = 'change';
+
 	if (Session.Entity.hasCart == false) {
 		return;
 	}
@@ -114,6 +127,31 @@ ChangeCart.onChangeCartSkill = function onChangeCartSkill() {
 	this.ui.show();
 
 	const msg = 'Change Cart!!';
+
+	if (ChatRoom.isOpen) {
+		ChatRoom.message(msg);
+		return;
+	}
+
+	ChatBox.addText(msg, ChatBox.TYPE.PUBLIC | ChatBox.TYPE.SELF, ChatBox.FILTER.PUBLIC_LOG);
+	if (Session.Entity) {
+		Session.Entity.dialog.set(msg);
+	}
+
+	updateList(Session.Character.level);
+	Renderer.render(render);
+};
+
+ChangeCart.onCartDecorateSkill = function onCartDecorateSkill() {
+	_mode = 'decorate';
+
+	if (Session.Entity.hasCart == false) {
+		return;
+	}
+
+	this.ui.show();
+
+	const msg = 'Cart Decoration!!';
 
 	if (ChatRoom.isOpen) {
 		ChatRoom.message(msg);
@@ -139,6 +177,15 @@ function updateList(blvl) {
 	}
 
 	ChangeCart.ui.find('.cart').hide();
+
+	if (_mode === 'decorate') {
+		ChangeCart.ui.find(".cart[data-id='10']").show();
+		ChangeCart.ui.find(".cart[data-id='11']").show();
+		ChangeCart.ui.find(".cart[data-id='12']").show();
+		ChangeCart.ui.find(".cart[data-id='13']").show();
+		return;
+	}
+
 	//stopAllCart();
 
 	if (blvl > 131) {

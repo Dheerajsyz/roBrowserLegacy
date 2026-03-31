@@ -19,6 +19,7 @@ import EntityManager from 'Renderer/EntityManager.js';
 import EffectManager from 'Renderer/EffectManager.js';
 import Altitude from 'Renderer/Map/Altitude.js';
 import ShortCut from 'UI/Components/ShortCut/ShortCut.js';
+import UIManager from 'UI/UIManager.js';
 import ChatBox from 'UI/Components/ChatBox/ChatBox.js';
 import SkillTargetSelection from 'UI/Components/SkillTargetSelection/SkillTargetSelection.js';
 import Guild from 'UI/Components/Guild/Guild.js';
@@ -661,6 +662,12 @@ function onUseSkill(id, level, targetID) {
 	if (id === SkillId.MC_CHANGECART) {
 		if (Session.Entity.hasCart == true) {
 			UIManager.getComponent('ChangeCart').onChangeCartSkill();
+		}
+	}
+
+	if (id === SkillId.MC_CARTDECORATE) {
+		if (Session.Entity.hasCart == true) {
+			UIManager.getComponent('ChangeCart').onCartDecorateSkill();
 		}
 	}
 
